@@ -57,8 +57,6 @@ if st.button("🔍 Analyze Email"):
                     st.write("**Root Cause Analysis:**", data["root_cause"])
                 if "grammar_issues" in data:
                     st.write("**Grammar & Spelling Issues:**", data["grammar_issues"])
-                if "clarity_score" in data:
-                    st.write("**Clarity Score:**", data["clarity_score"])
                 if "best_response_time" in data:
                     st.write("**Best Time to Respond:**", data["best_response_time"])
                 if "professionalism_score" in data:
@@ -72,4 +70,3 @@ if st.button("🔍 Analyze Email"):
             st.error(f"An error occurred: {e}")
     else:
         st.error("Please paste email content before clicking 'Analyze Email'.")
-
