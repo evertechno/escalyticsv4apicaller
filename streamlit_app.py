@@ -3,7 +3,7 @@ import requests
 import json
 
 # URL of your Flask API deployed on Render
-API_URL = "https://your-render-app-url/analyze-email"
+API_URL = "https://escalyticsv4api.onrender.com/analyze-email"
 
 # Streamlit App Configuration
 st.set_page_config(page_title="Email Analysis", page_icon="📧", layout="wide")
