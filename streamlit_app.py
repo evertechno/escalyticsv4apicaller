@@ -2,71 +2,81 @@ import streamlit as st
 import requests
 import json
 
-# URL of your Flask API deployed on Render
-API_URL = "https://escalyticsv4api.onrender.com/analyze-email"
+# API URL of your FastAPI hosted on Render
+API_URL = "https://escalaticsapi.onrender.com/analyze-email"
 
-# Streamlit App Configuration
-st.set_page_config(page_title="Email Analysis", page_icon="📧", layout="wide")
-st.title("📨 Email Analysis & Insights")
+# Streamlit UI setup
+st.title("Email Content Analyzer")
+st.write("Enter the text of an email to get its sentiment analysis, summary, and more.")
 
-st.write("Paste your email content below, and we'll analyze it with AI!")
+# User input
+email_text = st.text_area("Enter Email Text", height=200)
 
-# Input field for the email content
-email_content = st.text_area("📩 Paste your email content here:", height=200)
-
-# Button to trigger analysis
-if st.button("🔍 Analyze Email"):
-    if email_content:
+# Button to trigger the analysis
+if st.button("Analyze Email"):
+    if email_text:
+        # Prepare the request payload
+        email_data = {
+            "email_text": email_text
+        }
+        
+        # Send POST request to the FastAPI endpoint
         try:
-            # Prepare the payload for the API request
-            payload = {"email_content": email_content}
+            response = requests.post(API_URL, json=email_data)
             
-            # Send the POST request to the Flask API
-            response = requests.post(API_URL, json=payload)
-            
-            # Check if the response is successful (status code 200)
+            # Check for successful response
             if response.status_code == 200:
                 data = response.json()
                 
-                # Display the results
-                st.subheader("📌 Email Analysis Results")
-                if "summary" in data:
-                    st.write("**Summary:**", data["summary"])
-                if "response" in data:
-                    st.write("**Suggested Response:**", data["response"])
-                if "sentiment" in data:
-                    sentiment = data["sentiment"]
-                    st.write(f"**Sentiment:** {sentiment['label']} (Polarity: {sentiment['polarity']})")
-                if "readability_score" in data:
-                    st.write(f"**Readability Score:** {data['readability_score']} / 10")
-                if "tone" in data:
-                    st.write("**Tone:**", data["tone"])
-                if "urgency" in data:
-                    st.write("**Urgency Level:**", data["urgency"])
-                if "tasks" in data:
-                    st.write("**Actionable Tasks:**", data["tasks"])
-                if "subject_recommendation" in data:
-                    st.write("**Subject Recommendation:**", data["subject_recommendation"])
-                if "category" in data:
-                    st.write("**Category:**", data["category"])
-                if "emotion" in data:
-                    st.write("**Emotion Analysis:**", data["emotion"])
-                if "spam_status" in data:
-                    st.write("**Spam Status:**", data["spam_status"])
-                if "root_cause" in data:
-                    st.write("**Root Cause Analysis:**", data["root_cause"])
-                if "grammar_issues" in data:
-                    st.write("**Grammar & Spelling Issues:**", data["grammar_issues"])
-                if "best_response_time" in data:
-                    st.write("**Best Time to Respond:**", data["best_response_time"])
-                if "professionalism_score" in data:
-                    st.write("**Professionalism Score:**", data["professionalism_score"])
-
+                # Display summary
+                st.subheader("Summary")
+                st.write(data.get("summary", "No summary available"))
+                
+                # Display sentiment analysis
+                sentiment = data.get("sentiment", {})
+                sentiment_label = sentiment.get("label", "Unknown")
+                sentiment_score = sentiment.get("score", 0)
+                st.subheader("Sentiment Analysis")
+                st.write(f"Sentiment: {sentiment_label}")
+                st.write(f"Sentiment Score: {sentiment_score}")
+                
+                # Display key phrases
+                st.subheader("Key Phrases")
+                st.write(data.get("key_phrases", "No key phrases available"))
+                
+                # Display actionable items
+                st.subheader("Actionable Items")
+                st.write(data.get("actionable_items", "No actionable items available"))
+                
+                # Display root cause detection
+                st.subheader("Root Cause")
+                st.write(data.get("root_cause", "No root cause detected"))
+                
+                # Display culprit identification
+                st.subheader("Culprit")
+                st.write(data.get("culprit", "No culprit identified"))
+                
+                # Display trend analysis
+                st.subheader("Trend Analysis")
+                st.write(data.get("trends", "No trends detected"))
+                
+                # Display risk assessment
+                st.subheader("Risk Assessment")
+                st.write(data.get("risk", "No risk assessment provided"))
+                
+                # Display severity detection
+                st.subheader("Severity Detection")
+                st.write(data.get("severity", "No severity detected"))
+                
+                # Display critical keyword identification
+                st.subheader("Critical Keywords")
+                st.write(data.get("critical_keywords", "No critical keywords detected"))
+                
             else:
-                # Handle non-200 response status codes
-                st.error(f"Error: Unable to process the email. Status Code: {response.status_code}")
-                st.error(f"Message: {response.json().get('error', 'Unknown error occurred')}")
+                st.error(f"Failed to analyze email. Status code: {response.status_code}")
+                st.write(response.text)
+        
         except Exception as e:
-            st.error(f"An error occurred: {e}")
+            st.error(f"An error occurred while calling the API: {str(e)}")
     else:
-        st.error("Please paste email content before clicking 'Analyze Email'.")
+        st.warning("Please enter an email text to analyze.")
